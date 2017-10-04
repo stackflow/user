@@ -1,0 +1,28 @@
+<configuration debug="true" scan="true" scanPeriod="60 seconds">
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+        <encoder>
+            <pattern>%date{ISO8601} %highlight(%-5level) %logger{36} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>%date{ISO8601} %highlight(%-5level) %logger{36} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="TRACE">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="stderr"/>
+    </root>
+
+</configuration>
