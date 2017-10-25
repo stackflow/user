@@ -1,6 +1,6 @@
-package com.lordmancer2.user.net
+package com.lordmancer2.service.user.net
 
-import com.lordmancer2.user.net.route.{ControlRoute, Route}
+import com.lordmancer2.service.user.net.route.{ControlRoute, Route}
 import com.softwaremill.macwire.wire
 
 trait RouteModule {

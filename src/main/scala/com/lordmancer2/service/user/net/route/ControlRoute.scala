@@ -1,4 +1,4 @@
-package com.lordmancer2.user.net.route
+package com.lordmancer2.service.user.net.route
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server

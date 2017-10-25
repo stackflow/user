@@ -1,4 +1,4 @@
-package com.lordmancer2.user.net
+package com.lordmancer2.service.user.net
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.settings.RoutingSettings
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
-import com.lordmancer2.user.net.wrapper.Wrapper
+import com.lordmancer2.service.user.net.wrapper.Wrapper
 
 import scala.concurrent.ExecutionContext
 

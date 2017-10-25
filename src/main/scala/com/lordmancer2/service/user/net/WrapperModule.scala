@@ -1,6 +1,6 @@
-package com.lordmancer2.user.net
+package com.lordmancer2.service.user.net
 
-import com.lordmancer2.user.net.wrapper.{Encoding, Wrapper}
+import com.lordmancer2.service.user.net.wrapper.{Encoding, Wrapper}
 import com.softwaremill.macwire.wire
 
 trait WrapperModule {

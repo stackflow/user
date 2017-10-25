@@ -1,4 +1,4 @@
-package com.lordmancer2.user.config
+package com.lordmancer2.service.user.config
 
 import com.softwaremill.tagging._
 import com.typesafe.config.{Config, ConfigFactory}
@@ -19,12 +19,12 @@ trait ConfigModule extends LazyLogging {
     akkaConfig.as[Config]("http")
   }
 
-  lazy val serverHostConfig: String @@ ServerHostConfig = {
-    akkaHttpConfig.as[String]("server.host").taggedWith[ServerHostConfig]
+  lazy val serverHostConfig: String @@ ServerHost = {
+    akkaHttpConfig.as[String]("server.host").taggedWith[ServerHost]
   }
 
-  lazy val serverPortConfig: Int @@ ServerPortConfig = {
-    akkaHttpConfig.as[Int]("server.port").taggedWith[ServerPortConfig]
+  lazy val serverPortConfig: Int @@ ServerPort = {
+    akkaHttpConfig.as[Int]("server.port").taggedWith[ServerPort]
   }
 
 }

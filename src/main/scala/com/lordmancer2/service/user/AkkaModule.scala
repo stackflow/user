@@ -1,4 +1,4 @@
-package com.lordmancer2.user
+package com.lordmancer2.service.user
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer

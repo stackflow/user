@@ -1,4 +1,4 @@
-<configuration debug="true" scan="true" scanPeriod="60 seconds">
+<configuration debug="true" scan="false" scanPeriod="60 seconds">
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>

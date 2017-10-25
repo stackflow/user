@@ -1,4 +1,4 @@
-package com.lordmancer2.user.net.wrapper
+package com.lordmancer2.service.user.net.wrapper
 
 import akka.http.scaladsl.server.Route
 

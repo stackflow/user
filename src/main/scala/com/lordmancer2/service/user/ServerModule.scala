@@ -1,9 +1,9 @@
-package com.lordmancer2.user
+package com.lordmancer2.service.user
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.lordmancer2.user.config.ConfigModule
-import com.lordmancer2.user.net.{Api, RouteModule, Server, WrapperModule}
+import com.lordmancer2.service.user.config.ConfigModule
+import com.lordmancer2.service.user.net.{Api, RouteModule, Server, WrapperModule}
 import com.softwaremill.macwire.wire
 
 import scala.concurrent.ExecutionContext
