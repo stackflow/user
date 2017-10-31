@@ -1,12 +1,10 @@
-import java.util.Date
-
 organization := "com.lordmancer2"
 name := "user"
 version := "0.1.0"
 scalaVersion := "2.12.4"
 
 libraryDependencies ++= {
-  val akkaV = "2.4.19"
+  val akkaV = "2.4.20"
   val akkaHttpV = "10.0.10"
   Seq(
     "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided",
@@ -24,18 +22,10 @@ libraryDependencies ++= {
   )
 }
 
-mappings in(Compile, packageBin) += {
-  // logic like this belongs into an AutoPlugin
-  val confFile = buildEnv.value match {
-    case BuildEnv.Development => "development.conf"
-    case BuildEnv.Test => "test.conf"
-    case BuildEnv.Stage => "stage.conf"
-    case BuildEnv.Production => "production.conf"
-  }
-  ((resourceDirectory in Compile).value / confFile) -> "application.conf"
-}
+mappings in(Compile, packageBin) += ((resourceDirectory in Compile).value / s"${buildEnv.value.toString.toLowerCase}.conf") -> "application.conf"
+mappings in(Compile, packageBin) += ((resourceDirectory in Compile).value / s"logback-${buildEnv.value.toString.toLowerCase}.xml") -> "logback.xml"
 
-enablePlugins(DockerPlugin, MarathonPlugin)
+enablePlugins(DockerPlugin, TemplatingPlugin)
 
 // Define a Dockerfile
 dockerfile in docker := {
@@ -56,38 +46,36 @@ dockerfile in docker := {
   }
 }
 
-// specify the url of your Marathon service
-marathonServiceUrl := "http://localhost:8080"
-
 // specify the docker registry to which your images will be pushed
-dockerRegistry := "registry.mobak.ru:5443"
+dockerRegistry := sys.env.getOrElse("DOCKER_REGISTRY", "registry.mobak.ru:5443")
 
 val dockerImageName = settingKey[ImageName]("Docker image name")
 dockerImageName := ImageName(
   registry = Some(dockerRegistry.value),
-  namespace = Some(s"lordmancer2/${buildEnv.value.toString.toLowerCase}/service"),
+  namespace = Some(s"${buildEnv.value.toString.toLowerCase}/lordmancer2/service"),
   repository = "user",
   tag = Some("latest")
 )
 
 // Set names for the image
-imageNames in docker += dockerImageName.value
+imageNames in docker := Seq(dockerImageName.value)
+
+// specify the url of your Marathon service
+marathonServiceUrl := ""
 
 marathonApplicationId := s"/${buildEnv.value.toString.toLowerCase}/${name.value}"
 
-marathonServiceRequest := sbtmarathon.adt.Request.newBuilder()
-  .withId(marathonApplicationId.value)
-  .withContainer(
-    sbtmarathon.adt.DockerContainer(
-      image = dockerImageName.value.toString,
-      network = "BRIDGE"
-    )
-      //    .addParameter("v", "/var/run/docker.sock:/var/run/docker.sock")
-      .addPortMapping(8080, 0, None, "tcp")
-  )
-  .withCpus(.1)
-  .withMem(0)
-  .addEnv("timestamp", new Date().toString)
-  .addFetch(sbtmarathon.adt.Fetchable(uri = "file:///root/.dockercfg"))
-  .addHealthCheck(sbtmarathon.adt.HealthCheck.fromJsonString("    {\n      \"protocol\": \"HTTP\",\n      \"path\": \"/status\",\n      \"portIndex\": 0,\n      \"gracePeriodSeconds\": 300,\n      \"intervalSeconds\": 60,\n      \"timeoutSeconds\": 30,\n      \"maxConsecutiveFailures\": 3\n    }"))
-  .build()
+sourceDirectory in Templating := (sourceDirectory in Compile).value / "templates"
+target in Templating := (sourceDirectory in Compile).value / "generated"
+
+marathonTemplates += Template(
+  file = (sourceDirectory in Templating).value / "marathon.scala.json",
+  driver = new {
+    val appId = marathonApplicationId.value
+    val javaToolOptions = s"-Xms128m -Xmx128m -Dapplication.name=${name.value} -Dapplication.environment=${buildEnv.value.toString.toLowerCase}"
+    val jenkinsBuildId = sys.env.get("JENKINS_BUILD_ID")
+    val containerDockerImage = dockerImageName.value.toString()
+    val containerDockerPort = sys.env.getOrElse("HTTP_PORT", "8080").toInt
+    val uris = "file:///etc/docker.tar.gz"
+  }
+)

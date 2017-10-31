@@ -1,0 +1,37 @@
+<configuration debug="true" scan="false" scanPeriod="60 seconds">
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %logger{36} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %logger{36} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashSocketAppender">
+        <host>logstash.marathon.mesos</host>
+        <port>23514</port>
+        <customFields>{"app": "${application.name}", "env": "${application.environment}"}</customFields>
+    </appender>
+
+    <logger name="com.datastax.driver" level="INFO"/>
+    <logger name="org.apache.kafka" level="INFO"/>
+    <logger name="org.apache.zookeeper" level="INFO"/>
+    <logger name="org.elasticsearch" level="INFO"/>
+
+    <root level="DEBUG">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="stderr"/>
+        <appender-ref ref="logstash"/>
+    </root>
+
+</configuration>

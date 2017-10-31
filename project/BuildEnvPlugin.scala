@@ -13,7 +13,7 @@ object BuildEnvPlugin extends AutoPlugin {
   object autoImport {
 
     object BuildEnv extends Enumeration {
-      val Production, Stage, Test, Development = Value
+      val Master, Beta, Dev, Local = Value
     }
 
     val buildEnv = settingKey[BuildEnv.Value]("the current build environment")
@@ -27,13 +27,13 @@ object BuildEnvPlugin extends AutoPlugin {
       sys.props.get("env")
         .orElse(sys.env.get("BUILD_ENV"))
         .flatMap {
-          case "prod" => Some(BuildEnv.Production)
-          case "stage" => Some(BuildEnv.Stage)
-          case "test" => Some(BuildEnv.Test)
-          case "dev" => Some(BuildEnv.Development)
+          case "master" => Some(BuildEnv.Master)
+          case "beta" => Some(BuildEnv.Beta)
+          case "dev" => Some(BuildEnv.Dev)
+          case "local" => Some(BuildEnv.Local)
           case unkown => None
         }
-        .getOrElse(BuildEnv.Development)
+        .getOrElse(BuildEnv.Local)
     },
     // give feed back
     onLoadMessage := {
