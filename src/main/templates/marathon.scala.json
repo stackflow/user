@@ -1,9 +1,9 @@
-@(appId: String, javaToolOptions: String, jenkinsBuildId: Option[String], containerDockerImage: String, containerDockerPort: Int, uris: String)
+@(appId: String, cpus: Double, mem: Int, env: String, containerDockerImage: String, containerDockerPort: Int, uris: String)
 
 {
   "id": "@appId",
-  "cpus": 0.1,
-  "mem": 256,
+  "cpus": @cpus,
+  "mem": @mem,
   "instances": 1,
   "labels": {
     "MARATHON_SINGLE_INSTANCE_APP": "true"
@@ -15,10 +15,7 @@
       "true"
     ]
   ],
-  "env": {
-    "JAVA_TOOL_OPTIONS": "@javaToolOptions",
-    "JENKINS_BUILD_NUMBER": "@{jenkinsBuildId.getOrElse("")}"
-  },
+  "env": @env,
   "container": {
     "type": "DOCKER",
     "docker": {

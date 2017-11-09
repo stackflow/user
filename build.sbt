@@ -68,14 +68,28 @@ marathonApplicationId := s"/${buildEnv.value.toString.toLowerCase}/${name.value}
 sourceDirectory in Templating := (sourceDirectory in Compile).value / "templates"
 target in Templating := (sourceDirectory in Compile).value / "generated"
 
-marathonTemplates += Template(
-  file = (sourceDirectory in Templating).value / "marathon.scala.json",
-  driver = new {
-    val appId = marathonApplicationId.value
-    val javaToolOptions = s"-Xms128m -Xmx128m -Dapplication.name=${name.value} -Dapplication.environment=${buildEnv.value.toString.toLowerCase}"
-    val jenkinsBuildId = sys.env.get("JENKINS_BUILD_ID")
-    val containerDockerImage = dockerImageName.value.toString()
-    val containerDockerPort = sys.env.getOrElse("HTTP_PORT", "8080").toInt
-    val uris = "file:///etc/docker.tar.gz"
-  }
-)
+marathonTemplates := {
+  val httpPort = sys.env.getOrElse("HTTP_PORT", "8080").toInt
+  val cpu = 0.1
+  val memory = 128
+
+  val javaToolOptions = s"-Xms${memory}m -Xmx${memory}m -Dapplication.name=${name.value} -Dapplication.environment=${buildEnv.value.toString.toLowerCase}"
+  val jenkinsBuildId = sys.env.getOrElse("JENKINS_BUILD_ID", "")
+  val enviroments = Seq(
+    "JAVA_TOOL_OPTIONS" -> javaToolOptions,
+    "JENKINS_BUILD_NUMBER" -> jenkinsBuildId
+  )
+
+  Seq(Template(
+    file = (sourceDirectory in Templating).value / "marathon.scala.json",
+    driver = new {
+      val appId = marathonApplicationId.value
+      val cpus = cpu
+      val mem = 2 * memory
+      val env = "{\n" + enviroments.map(env => "\"" + env._1 + "\": \"" + env._2 + "\"").mkString(",\n") + "\n}"
+      val containerDockerImage = dockerImageName.value.toString()
+      val containerDockerPort = httpPort
+      val uris = "file:///etc/docker.tar.gz"
+    }
+  ))
+}
